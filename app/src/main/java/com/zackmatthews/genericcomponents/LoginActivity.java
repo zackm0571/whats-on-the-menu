@@ -18,6 +18,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -27,6 +28,14 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.zackmatthews.genericcomponents.managers.MyFirebaseManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +45,9 @@ import static android.Manifest.permission.READ_CONTACTS;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor>, OnCompleteListener<AuthResult> {
 
+    private static final boolean IS_DEBUG = false;
     /**
      * Id to identity READ_CONTACTS permission request.
      */
@@ -145,9 +155,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
 
         // Reset errors.
         mEmailView.setError(null);
@@ -186,8 +193,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
+            MyFirebaseManager.getInstance().loginWithUsernamePassword(email, password, this);
+            if(IS_DEBUG) {
+                mAuthTask = new UserLoginTask(email, password);
+                mAuthTask.execute((Void) null);
+            }
         }
     }
 
@@ -281,6 +291,37 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
 
+    @Override
+    public void onComplete(@NonNull Task< AuthResult > task) {
+        boolean isSuccessful = task.isSuccessful();
+        if (isSuccessful) {
+            // Sign in success, update UI with the signed-in user's information
+            Log.d("TAG", "signInWithEmail:success");
+            FirebaseUser user = MyFirebaseManager.getInstance().getFirebaseAuth().getCurrentUser();
+        } else {
+            // If sign in fails, display a message to the user.
+            Log.w("TAG", "signInWithEmail:failure", task.getException());
+            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                    Toast.LENGTH_SHORT).show();
+        }
+
+        onLoginRequestComplete(isSuccessful);
+    }
+
+    private void onLoginRequestComplete(boolean success){
+        showProgress(false);
+
+        if (success) {
+            finish();
+            startActivity(new Intent(LoginActivity.this, MAIN_CLASS));
+        } else {
+            mPasswordView.setError(getString(R.string.error_incorrect_password));
+            mPasswordView.requestFocus();
+        }
+    }
+
+
+
     private interface ProfileQuery {
         String[] PROJECTION = {
                 ContactsContract.CommonDataKinds.Email.ADDRESS,
@@ -299,7 +340,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
-
+        private FirebaseAuth mAuth;
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
@@ -310,9 +351,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // TODO: attempt authentication against a network service.
 
             try {
-                // Simulate network access.
+                //Simulate network access
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
+                e.printStackTrace();
                 return false;
             }
 

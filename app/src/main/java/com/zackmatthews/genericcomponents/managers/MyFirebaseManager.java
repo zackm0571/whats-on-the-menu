@@ -1,5 +1,7 @@
 package com.zackmatthews.genericcomponents.managers;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -10,6 +12,15 @@ import com.google.firebase.database.FirebaseDatabase;
 public class MyFirebaseManager implements FirebaseManager{
     private static final String postDir = "server/saving-data/fireblog/posts";
     private static MyFirebaseManager instance;
+    private FirebaseAuth mAuth;
+
+    public FirebaseAuth getFirebaseAuth() {
+        if(mAuth == null) {
+            mAuth = FirebaseAuth.getInstance();
+        }
+        return mAuth;
+    }
+
 
     public static MyFirebaseManager getInstance(){
         if(instance == null){
@@ -17,6 +28,7 @@ public class MyFirebaseManager implements FirebaseManager{
         }
         return instance;
     }
+
     @Override
     public Object getObjectOnceByKey(String key) {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -34,5 +46,9 @@ public class MyFirebaseManager implements FirebaseManager{
         myRef.setValue(val);
     }
 
-
+    @Override
+    public void loginWithUsernamePassword(String username, String password, OnCompleteListener listener) {
+        getFirebaseAuth().signInWithEmailAndPassword(username, password)
+                .addOnCompleteListener(listener);
+    }
 }
