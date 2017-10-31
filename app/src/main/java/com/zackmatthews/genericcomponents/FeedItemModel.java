@@ -5,7 +5,7 @@ package com.zackmatthews.genericcomponents;
  */
 
 public class FeedItemModel {
-    private int id;
-    private String title;
-    private String msg;
+    public String id;
+    public String title;
+    public String msg;
 }

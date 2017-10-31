@@ -19,6 +19,8 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         listView = (ListView)findViewById(R.id.listView);
         listView.setAdapter(new FeedAdapter(this));
+        ((FeedAdapter)listView.getAdapter()).attachToFirebase("posts");
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
