@@ -12,7 +12,7 @@ import com.google.firebase.database.ValueEventListener;
  */
 
 public class MyFirebaseManager implements FirebaseManager{
-    private static final String postDir = "posts";
+    public static final String postDir = "posts";
     private static MyFirebaseManager instance;
     private FirebaseAuth mAuth;
 
