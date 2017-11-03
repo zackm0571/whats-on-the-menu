@@ -60,16 +60,18 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
     public View getView(int i, View view, ViewGroup viewGroup) {
         if(view == null){
             LayoutInflater inflater = (LayoutInflater)ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(RES_ID, null);
+            if(inflater != null) {
+                view = inflater.inflate(RES_ID, null);
+            }
         }
         final FeedItemModel model = getItem(i);
-        TextView title = (TextView)view.findViewById(R.id.title);
+        TextView title = view.findViewById(R.id.title);
         title.setText(model.title);
 
-        TextView msg = (TextView)view.findViewById(R.id.msg);
+        TextView msg = view.findViewById(R.id.msg);
         msg.setText(model.msg);
 
-        final ImageView img = (ImageView)view.findViewById(R.id.feed_item_img);
+        final ImageView img = view.findViewById(R.id.feed_item_img);
 
         final boolean isPicsEnabled = true;
         if(!isPicsEnabled) return view;
