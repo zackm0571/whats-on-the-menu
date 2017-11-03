@@ -1,5 +1,7 @@
 package com.zackmatthews.genericcomponents.managers;
 
+import android.util.Pair;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -10,8 +12,8 @@ import java.util.LinkedList;
 
 public class LruCacheManager {
     private static final int MAX_CACHE = 20;
-    private HashMap<String, File> map = new HashMap<>();
-    private LinkedList<File> cache = new LinkedList<>();
+    private HashMap<String, Pair<String, File>> map = new HashMap<>();
+    private LinkedList<Pair<String, File>> cache = new LinkedList<>();
 
     public static LruCacheManager getInstance() {
         if(instance == null){
@@ -23,24 +25,29 @@ public class LruCacheManager {
     private static LruCacheManager instance;
 
     public void put(String key, File obj){
-        if(cache.contains(obj)){
-            cache.remove(obj);
-            cache.push(obj);
-            map.put(key, obj);
+        if(cache.contains(map.get(key))){
             return;
         }
 
-        cache.push(obj);
+        cache.push(new Pair<>(key, obj));
         map.put(key, cache.peekFirst());
 
         if(cache.size() > MAX_CACHE){
-            cache.removeLast();
-            map.remove(key);
+            for(int i = 0; i < MAX_CACHE / 2; i++) {
+                Pair<String, File> node = cache.removeLast();
+                map.remove(node.first);
+                node.second.delete();
+            }
+
         }
     }
 
     public File get(String key){
-        return map.get(key);
+        Pair<String, File> node = map.get(key);
+        if(node != null) {
+            return map.get(key).second;
+        }
+        return null;
     }
 
 }
