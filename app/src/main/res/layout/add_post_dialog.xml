@@ -18,4 +18,10 @@
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:hint="@string/add_post_message_hint"/>
+
+    <Button
+        android:id="@+id/btn_addpost_picture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add picture"/>
 </LinearLayout>

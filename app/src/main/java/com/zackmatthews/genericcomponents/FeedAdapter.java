@@ -1,17 +1,26 @@
 package com.zackmatthews.genericcomponents;
 
 import android.content.Context;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.zackmatthews.genericcomponents.managers.LruCacheManager;
 import com.zackmatthews.genericcomponents.managers.MyFirebaseManager;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,11 +62,53 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
             LayoutInflater inflater = (LayoutInflater)ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(RES_ID, null);
         }
+        final FeedItemModel model = getItem(i);
         TextView title = (TextView)view.findViewById(R.id.title);
-        title.setText(getItem(i).title);
+        title.setText(model.title);
 
         TextView msg = (TextView)view.findViewById(R.id.msg);
-        msg.setText(getItem(i).msg);
+        msg.setText(model.msg);
+
+        final ImageView img = (ImageView)view.findViewById(R.id.feed_item_img);
+
+        final boolean isPicsEnabled = true;
+        if(!isPicsEnabled) return view;
+
+        File tmpPic = LruCacheManager.getInstance().get(model.id);
+        boolean isCached = false;
+        img.setImageURI(null);
+
+        if(tmpPic != null){
+            Uri photoURI = Uri.fromFile(tmpPic);
+            img.setImageURI(photoURI);
+            isCached = true;
+        }
+        else{
+            try {
+                tmpPic = File.createTempFile(model.id, ".jpg");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        if(!isCached) {
+            final Uri photoURI = Uri.fromFile(tmpPic);
+            MyFirebaseManager.getInstance().getStorageRef().child(model.id).getFile(photoURI)
+                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                            img.setImageURI(photoURI);
+                            LruCacheManager.getInstance().put(model.id, new File(photoURI.getPath()));
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    img.setImageURI(null);
+                }
+            });
+        }
+
         return view;
     }
 

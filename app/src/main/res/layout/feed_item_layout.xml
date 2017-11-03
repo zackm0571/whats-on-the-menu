@@ -10,6 +10,10 @@
         android:layout_gravity="center"
         android:background="@android:color/darker_gray"
         >
+        <ImageView
+            android:id="@+id/feed_item_img"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
