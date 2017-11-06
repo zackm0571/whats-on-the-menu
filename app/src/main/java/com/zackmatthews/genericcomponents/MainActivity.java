@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -27,7 +28,7 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity implements OnSuccessListener{
 
     private ListView listView;
-    private AlertDialog dialogView;
+    private AlertDialog dialogView, deletePostDialogView;
     private String tmpUploadDir = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,13 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         setContentView(R.layout.activity_main);
         listView = (ListView)findViewById(R.id.listView);
         listView.setAdapter(new FeedAdapter(this));
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                showDeletePostDialog((FeedItemModel)adapterView.getItemAtPosition(i));
+                return false;
+            }
+        });
         ((FeedAdapter)listView.getAdapter()).attachToFirebase("posts");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -51,6 +59,22 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                 //MyFirebaseManager.getInstance().writeObjectToDb("messages", "Hello World!");
             }
         });
+    }
+
+    private void showDeletePostDialog(final FeedItemModel item){
+
+        if(deletePostDialogView != null){
+            deletePostDialogView.dismiss();
+        }
+
+        deletePostDialogView = new AlertDialog.Builder(this).setTitle("Delete Post?")
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        item.deletePost();
+                    }
+                }).create();
+        deletePostDialogView.show();
     }
 
     private void showAddPostDialog(){

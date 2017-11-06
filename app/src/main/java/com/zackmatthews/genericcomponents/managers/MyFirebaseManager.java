@@ -48,6 +48,13 @@ public class MyFirebaseManager implements FirebaseManager{
     }
 
     @Override
+    public void deleteObjectInDb(String key) {
+        final FirebaseDatabase db = FirebaseDatabase.getInstance();
+        DatabaseReference ref = db.getReference().child(key);
+        ref.removeValue();
+    }
+
+    @Override
     public void getObjectWithValueChangeListener(String key, ValueEventListener listener) {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference(key);

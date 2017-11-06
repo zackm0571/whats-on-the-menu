@@ -16,6 +16,7 @@ public interface FirebaseManager {
     void getObjectWithValueChangeListener(String key, ValueEventListener listener);
     void queryObjectLimitedToCountWithListener(String key, int count, ValueEventListener listener);
     void uploadFile(String path, String fileName, OnSuccessListener listener);
+    void deleteObjectInDb(String key);
     String downloadFile(String key, OnSuccessListener listener);
     StorageReference getStorageRef();
 }
