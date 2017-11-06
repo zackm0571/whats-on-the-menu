@@ -22,6 +22,15 @@ public class MyFirebaseManager implements FirebaseManager{
     public static final String postDir = "posts";
     public static final String imageDir = "images";
     private static MyFirebaseManager instance;
+
+    public FirebaseDatabase getDb() {
+        if(db == null){
+            db = FirebaseDatabase.getInstance();
+        }
+        return db;
+    }
+
+    private FirebaseDatabase db;
     private FirebaseAuth mAuth;
 
     public FirebaseAuth getFirebaseAuth() {
@@ -41,30 +50,26 @@ public class MyFirebaseManager implements FirebaseManager{
 
     @Override
     public Object getObjectOnceByKey(String key) {
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference(key);
+        DatabaseReference ref = getDb().getReference(key);
 
         return null;
     }
 
     @Override
     public void deleteObjectInDb(String key) {
-        final FirebaseDatabase db = FirebaseDatabase.getInstance();
-        DatabaseReference ref = db.getReference().child(key);
+        DatabaseReference ref = getDb().getReference().child(key);
         ref.removeValue();
     }
 
     @Override
     public void getObjectWithValueChangeListener(String key, ValueEventListener listener) {
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference(key);
+        DatabaseReference ref = getDb().getReference(key);
         ref.addValueEventListener(listener);
     }
 
     @Override
     public void queryObjectLimitedToCountWithListener(String key, int count, ValueEventListener listener) {
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference(key);
+        DatabaseReference ref = getDb().getReference(key);
         Query query = ref.limitToLast(count);
         query.addValueEventListener(listener);
     }
@@ -72,9 +77,7 @@ public class MyFirebaseManager implements FirebaseManager{
     @Override
     public void writeObjectToDb(String key, Object val) {
         // Write a message to the database
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference(key);
-
+        DatabaseReference myRef = getDb().getReference(key);
         myRef.setValue(val);
     }
 
