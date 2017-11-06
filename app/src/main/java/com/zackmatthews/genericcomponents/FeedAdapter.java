@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -61,6 +62,7 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
     static class ViewHolder{
         TextView msg, title;
         ImageView img;
+        ProgressBar progressBar;
     }
 
     @Override
@@ -74,6 +76,7 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
                 holder.msg = view.findViewById(R.id.msg);
                 holder.title = view.findViewById(R.id.title);
                 holder.img = view.findViewById(R.id.feed_item_img);
+                holder.progressBar = view.findViewById(R.id.progressBar);
                 view.setTag(holder);
             }
         }
@@ -96,13 +99,15 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
 
         boolean isCached = false;
         File tmpPic = null;
-        holder.img.setImageURI(null);
+        holder.img.setImageBitmap(null);
 
         if(bmp != null){
             holder.img.setImageBitmap(bmp);
+            holder.progressBar.setVisibility(View.GONE);
             isCached = true;
         }
         else{
+            holder.progressBar.setVisibility(View.VISIBLE);
             try {
                 tmpPic = File.createTempFile(model.id, ".jpg");
             } catch (IOException e) {
@@ -122,12 +127,14 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
                                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                                     Bitmap _bmp = BitmapFactory.decodeFile(tmpPhotoURI.getPath());
                                     tmpHolder.img.setImageBitmap(_bmp);
+                                    tmpHolder.progressBar.setVisibility(View.GONE);
                                     LruCacheManager.getInstance().put(model.id, _bmp);
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception exception) {
                             tmpHolder.img.setImageBitmap(null);
+                            tmpHolder.progressBar.setVisibility(View.GONE);
                         }
                     });
                 }
