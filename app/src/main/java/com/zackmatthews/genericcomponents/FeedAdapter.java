@@ -1,6 +1,8 @@
 package com.zackmatthews.genericcomponents;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -56,33 +58,48 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
         return 0;
     }
 
+    static class ViewHolder{
+        TextView msg, title;
+        ImageView img;
+    }
+
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
+        ViewHolder holder = null;
         if(view == null){
             LayoutInflater inflater = (LayoutInflater)ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             if(inflater != null) {
                 view = inflater.inflate(RES_ID, null);
+                holder = new ViewHolder();
+                holder.msg = view.findViewById(R.id.msg);
+                holder.title = view.findViewById(R.id.title);
+                holder.img = view.findViewById(R.id.feed_item_img);
+                view.setTag(holder);
             }
         }
+        else{
+            holder = (ViewHolder)view.getTag();
+        }
+
+        if(holder == null) return view;
+
         final FeedItemModel model = getItem(i);
-        TextView title = view.findViewById(R.id.title);
-        title.setText(model.title);
 
-        TextView msg = view.findViewById(R.id.msg);
-        msg.setText(model.msg);
+        holder.title.setText(model.title);
+        holder.msg.setText(model.msg);
 
-        final ImageView img = view.findViewById(R.id.feed_item_img);
 
         final boolean isPicsEnabled = true;
         if(!isPicsEnabled) return view;
 
-        File tmpPic = LruCacheManager.getInstance().get(model.id);
-        boolean isCached = false;
-        img.setImageURI(null);
+        Bitmap bmp = LruCacheManager.getInstance().get(model.id);
 
-        if(tmpPic != null){
-            Uri photoURI = Uri.fromFile(tmpPic);
-            img.setImageURI(photoURI);
+        boolean isCached = false;
+        File tmpPic = null;
+        holder.img.setImageURI(null);
+
+        if(bmp != null){
+            holder.img.setImageBitmap(bmp);
             isCached = true;
         }
         else{
@@ -93,22 +110,29 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
             }
         }
 
-
         if(!isCached) {
-            final Uri photoURI = Uri.fromFile(tmpPic);
-            MyFirebaseManager.getInstance().getStorageRef().child(model.id).getFile(photoURI)
-                    .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                            img.setImageURI(photoURI);
-                            LruCacheManager.getInstance().put(model.id, new File(photoURI.getPath()));
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
+            final Uri tmpPhotoURI = Uri.fromFile(tmpPic);
+            final ViewHolder tmpHolder = holder;
+            new Thread(new Runnable() {
                 @Override
-                public void onFailure(@NonNull Exception exception) {
-                    img.setImageURI(null);
+                public void run() {
+                    MyFirebaseManager.getInstance().getStorageRef().child(model.id).getFile(tmpPhotoURI)
+                            .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                    Bitmap _bmp = BitmapFactory.decodeFile(tmpPhotoURI.getPath());
+                                    tmpHolder.img.setImageBitmap(_bmp);
+                                    LruCacheManager.getInstance().put(model.id, _bmp);
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            tmpHolder.img.setImageBitmap(null);
+                        }
+                    });
                 }
-            });
+            }).start();
+
         }
 
         return view;
