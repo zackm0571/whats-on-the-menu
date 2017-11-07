@@ -2,8 +2,6 @@ package com.zackmatthews.genericcomponents;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,7 +21,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.zackmatthews.genericcomponents.managers.MyFirebaseManager;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -144,32 +141,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Bitmap bmp = BitmapFactory.decodeFile(tmpUploadDir);
-                    final int width = 320, height = 280;
-                    Bitmap.createScaledBitmap(bmp, width, height, false);
-                    FileOutputStream out = null;
-                    try {
-                        out = new FileOutputStream(tmpUploadDir);
-                        bmp.compress(Bitmap.CompressFormat.JPEG, 100, out); // bmp is your Bitmap instance
-                        // PNG is a lossless format, the compression factor (100) is ignored
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        try {
-                            if (out != null) {
-                                out.close();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }).start();
-
+            //Bundle extras = data.getExtras();
             //tmpBitmap = (Bitmap) extras.get("data");
         }
     }
@@ -203,6 +175,6 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
     @Override
     public void onSuccess(Object o) {
         ((FeedAdapter)listView.getAdapter()).notifyDataSetChanged();
-
+        tmpUploadDir = "";
     }
 }
