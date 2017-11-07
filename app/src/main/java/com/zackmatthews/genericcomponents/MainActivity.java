@@ -202,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
 
     @Override
     public void onSuccess(Object o) {
+        ((FeedAdapter)listView.getAdapter()).notifyDataSetChanged();
 
     }
 }

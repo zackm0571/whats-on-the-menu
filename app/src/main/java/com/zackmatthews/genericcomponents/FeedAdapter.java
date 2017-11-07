@@ -102,9 +102,11 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
         holder.img.setImageBitmap(null);
 
         if(bmp != null){
-            holder.img.setImageBitmap(bmp);
-            holder.progressBar.setVisibility(View.GONE);
-            isCached = true;
+            if(model.id.equals(getItem(i).id)) {
+                holder.img.setImageBitmap(bmp);
+                holder.progressBar.setVisibility(View.GONE);
+                isCached = true;
+            }
         }
         else{
             holder.progressBar.setVisibility(View.VISIBLE);
