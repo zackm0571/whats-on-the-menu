@@ -143,6 +143,9 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             //Bundle extras = data.getExtras();
             //tmpBitmap = (Bitmap) extras.get("data");
+            if(tmpUploadDir != null && tmpUploadDir.length() > 0) {
+                ((Button) dialogView.findViewById(R.id.btn_addpost_picture)).setText("Take another picture");
+            }
         }
     }
 
