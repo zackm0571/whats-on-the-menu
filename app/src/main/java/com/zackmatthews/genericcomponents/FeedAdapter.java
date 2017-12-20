@@ -63,6 +63,7 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
         TextView msg, title;
         ImageView img;
         ProgressBar progressBar;
+        ViewGroup imageHolder;
     }
 
     @Override
@@ -77,6 +78,7 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
                 holder.title = view.findViewById(R.id.title);
                 holder.img = view.findViewById(R.id.feed_item_img);
                 holder.progressBar = view.findViewById(R.id.progressBar);
+                holder.imageHolder = view.findViewById(R.id.imageHolder);
                 view.setTag(holder);
             }
         }
@@ -104,6 +106,7 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
         if(bmp != null){
             if(model.id.equals(getItem(i).id)) {
                 holder.img.setImageBitmap(bmp);
+                holder.imageHolder.setVisibility(View.VISIBLE);
                 holder.progressBar.setVisibility(View.GONE);
                 isCached = true;
             }
@@ -129,6 +132,7 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
                                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                                     Bitmap _bmp = BitmapFactory.decodeFile(tmpPhotoURI.getPath());
                                     tmpHolder.img.setImageBitmap(_bmp);
+                                    tmpHolder.imageHolder.setVisibility(View.VISIBLE);
                                     tmpHolder.progressBar.setVisibility(View.GONE);
                                     LruCacheManager.getInstance().put(model.id, _bmp);
                                 }
@@ -136,6 +140,7 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
                         @Override
                         public void onFailure(@NonNull Exception exception) {
                             tmpHolder.img.setImageBitmap(null);
+                            tmpHolder.imageHolder.setVisibility(View.GONE);
                             tmpHolder.progressBar.setVisibility(View.GONE);
                         }
                     });
