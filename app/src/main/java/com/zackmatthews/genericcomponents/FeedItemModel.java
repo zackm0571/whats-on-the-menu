@@ -10,6 +10,7 @@ public class FeedItemModel {
     public String id;
     public String title;
     public String msg;
+    public String img_id;
 
     public void deletePost(){
         MyFirebaseManager.getInstance().deleteObjectInDb(MyFirebaseManager.postDir + "/" + id);

@@ -95,23 +95,24 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
 
 
         final boolean isPicsEnabled = true;
-        if(!isPicsEnabled) return view;
-
+        if(!isPicsEnabled || model.img_id == null) {
+            holder.imageHolder.setVisibility(View.GONE);
+            return view;
+        }
         Bitmap bmp = LruCacheManager.getInstance().get(model.id);
 
         boolean isCached = false;
         File tmpPic = null;
-        holder.img.setImageBitmap(null);
+        //holder.img.setImageBitmap(null);
 
         if(bmp != null){
-            if(model.id.equals(getItem(i).id)) {
-                holder.img.setImageBitmap(bmp);
-                holder.imageHolder.setVisibility(View.VISIBLE);
-                holder.progressBar.setVisibility(View.GONE);
-                isCached = true;
-            }
+            holder.img.setImageBitmap(bmp);
+            holder.imageHolder.setVisibility(View.VISIBLE);
+            holder.progressBar.setVisibility(View.GONE);
+            isCached = true;
         }
         else{
+            holder.imageHolder.setVisibility(View.VISIBLE);
             holder.progressBar.setVisibility(View.VISIBLE);
             try {
                 tmpPic = File.createTempFile(model.id, ".jpg");

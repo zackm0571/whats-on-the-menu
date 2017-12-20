@@ -96,15 +96,18 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                     public void onClick(DialogInterface dialogInterface, int i) {
                         EditText titleText = (EditText)((AlertDialog)dialogInterface).findViewById(R.id.et_addpost_title);
                         EditText msgText = (EditText)((AlertDialog)dialogInterface).findViewById(R.id.et_addpost_msg);
+                        boolean hasImg = tmpUploadDir != null && tmpUploadDir.length() > 0;
 
                         FeedItemModel item = new FeedItemModel();
                         item.id = String.valueOf(System.currentTimeMillis());
                         item.msg = msgText.getText().toString();
                         item.title = titleText.getText().toString();
-                        MyFirebaseManager.getInstance().writeObjectToDb(MyFirebaseManager.postDir + "/" + item.id, item);
-                        if(tmpUploadDir != null && tmpUploadDir.length() > 0){
-                            MyFirebaseManager.getInstance().uploadFile(tmpUploadDir, item.id, MainActivity.this);
+                        if(hasImg){
+                            item.img_id = item.id;
+                            MyFirebaseManager.getInstance().uploadFile(tmpUploadDir, item.img_id, MainActivity.this);
                         }
+
+                        MyFirebaseManager.getInstance().writeObjectToDb(MyFirebaseManager.postDir + "/" + item.id, item);
                     }
                 })
                 .create();
