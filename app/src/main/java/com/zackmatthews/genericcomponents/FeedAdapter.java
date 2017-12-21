@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 /**
  * Created by zackmatthews on 9/25/17.
@@ -88,67 +90,20 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
 
         if(holder == null) return view;
 
-        final FeedItemModel model = getItem(i);
+        FeedItemModel model = getItem(i);
 
         holder.title.setText(model.title);
         holder.msg.setText(model.msg);
 
 
-        final boolean isPicsEnabled = true;
-        if(!isPicsEnabled || model.img_id == null) {
-            holder.imageHolder.setVisibility(View.GONE);
-            return view;
-        }
-        Bitmap bmp = LruCacheManager.getInstance().get(model.id);
-
-        boolean isCached = false;
-        File tmpPic = null;
+        boolean isPicsEnabled = true;
+        holder.imageHolder.setVisibility(View.GONE);
         //holder.img.setImageBitmap(null);
 
-        if(bmp != null){
-            holder.img.setImageBitmap(bmp);
-            holder.imageHolder.setVisibility(View.VISIBLE);
-            holder.progressBar.setVisibility(View.GONE);
-            isCached = true;
+        if(!isPicsEnabled || model.img_id == null) {
+            return view;
         }
-        else{
-            holder.imageHolder.setVisibility(View.VISIBLE);
-            holder.progressBar.setVisibility(View.VISIBLE);
-            try {
-                tmpPic = File.createTempFile(model.id, ".jpg");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if(!isCached) {
-            final Uri tmpPhotoURI = Uri.fromFile(tmpPic);
-            final ViewHolder tmpHolder = holder;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    MyFirebaseManager.getInstance().getStorageRef().child(model.id).getFile(tmpPhotoURI)
-                            .addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                    Bitmap _bmp = BitmapFactory.decodeFile(tmpPhotoURI.getPath());
-                                    tmpHolder.img.setImageBitmap(_bmp);
-                                    tmpHolder.imageHolder.setVisibility(View.VISIBLE);
-                                    tmpHolder.progressBar.setVisibility(View.GONE);
-                                    LruCacheManager.getInstance().put(model.id, _bmp);
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            tmpHolder.img.setImageBitmap(null);
-                            tmpHolder.imageHolder.setVisibility(View.GONE);
-                            tmpHolder.progressBar.setVisibility(View.GONE);
-                        }
-                    });
-                }
-            }).start();
-
-        }
+        new LoadImageTask(model, holder).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, null);
 
         return view;
     }
@@ -170,5 +125,78 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
     @Override
     public void onCancelled(DatabaseError databaseError) {
 
+    }
+}
+
+class LoadImageTask extends AsyncTask<Void, Void, Bitmap>
+                    implements OnSuccessListener<FileDownloadTask.TaskSnapshot>,
+                     OnFailureListener{
+    private FeedItemModel model;
+    private FeedAdapter.ViewHolder holder;
+    private File tmpPic = null;
+    private Uri tmpPhotoURI;
+    private Bitmap bmp;
+
+    public LoadImageTask(FeedItemModel model, FeedAdapter.ViewHolder holder){
+        this.model = model;
+        this.holder = holder;
+    }
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+    }
+
+    @Override
+    protected Bitmap doInBackground(Void... arg) {
+        bmp = LruCacheManager.getInstance().get(model.id);
+        if(bmp == null){
+            try {
+                tmpPic = File.createTempFile(model.id, ".jpg");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            tmpPhotoURI = Uri.fromFile(tmpPic);
+
+            MyFirebaseManager.getInstance().getStorageRef().child(model.id).getFile(tmpPhotoURI)
+                    .addOnSuccessListener(this).addOnFailureListener(this);
+        }
+        return bmp;
+    }
+
+    @Override
+    protected void onPostExecute(Bitmap bmp) {
+        super.onPostExecute(bmp);
+        boolean isCached = bmp != null;
+
+        if(isCached){
+            holder.img.setImageBitmap(bmp);
+            holder.img.setVisibility(View.VISIBLE);
+            holder.imageHolder.setVisibility(View.VISIBLE);
+            holder.progressBar.setVisibility(View.GONE);
+        }
+        else{
+            holder.imageHolder.setVisibility(View.VISIBLE);
+            holder.progressBar.setVisibility(View.VISIBLE);
+            holder.img.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+        bmp = BitmapFactory.decodeFile(tmpPhotoURI.getPath());
+        holder.img.setImageBitmap(bmp);
+        holder.img.setVisibility(View.VISIBLE);
+        holder.imageHolder.setVisibility(View.VISIBLE);
+        holder.progressBar.setVisibility(View.GONE);
+        LruCacheManager.getInstance().put(model.id, bmp);
+    }
+
+    @Override
+    public void onFailure(@NonNull Exception e) {
+        holder.img.setImageBitmap(null);
+        holder.img.setVisibility(View.GONE);
+        holder.imageHolder.setVisibility(View.GONE);
+        holder.progressBar.setVisibility(View.GONE);
     }
 }
