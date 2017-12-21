@@ -14,6 +14,6 @@
         completions."
     </string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="add_post_title_hint">title</string>
+    <string name="add_post_title_hint">Title</string>
     <string name="add_post_message_hint">Message</string>
 </resources>

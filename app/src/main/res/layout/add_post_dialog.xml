@@ -10,12 +10,14 @@
         android:id="@+id/et_addpost_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="textCapSentences"
         android:layout_margin="20dp"
         android:hint="@string/add_post_title_hint"/>
     <EditText
         android:id="@+id/et_addpost_msg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="textCapSentences"
         android:layout_margin="20dp"
         android:hint="@string/add_post_message_hint"/>
 
