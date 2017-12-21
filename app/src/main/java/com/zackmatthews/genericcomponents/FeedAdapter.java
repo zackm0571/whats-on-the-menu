@@ -148,17 +148,17 @@ class LoadImageTask extends AsyncTask<Void, Void, Bitmap>
 
     @Override
     protected Bitmap doInBackground(Void... arg) {
-        bmp = LruCacheManager.getInstance().get(model.id);
+        bmp = LruCacheManager.getInstance().get(model.img_id);
         if(bmp == null){
             try {
-                tmpPic = File.createTempFile(model.id, ".jpg");
+                tmpPic = File.createTempFile(model.img_id, ".jpg");
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             tmpPhotoURI = Uri.fromFile(tmpPic);
 
-            MyFirebaseManager.getInstance().getStorageRef().child(model.id).getFile(tmpPhotoURI)
+            MyFirebaseManager.getInstance().getStorageRef().child(model.img_id).getFile(tmpPhotoURI)
                     .addOnSuccessListener(this).addOnFailureListener(this);
         }
         return bmp;
@@ -189,7 +189,7 @@ class LoadImageTask extends AsyncTask<Void, Void, Bitmap>
         holder.img.setVisibility(View.VISIBLE);
         holder.imageHolder.setVisibility(View.VISIBLE);
         holder.progressBar.setVisibility(View.GONE);
-        LruCacheManager.getInstance().put(model.id, bmp);
+        LruCacheManager.getInstance().put(model.img_id, bmp);
     }
 
     @Override
