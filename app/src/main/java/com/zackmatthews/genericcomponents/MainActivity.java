@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         ((FeedAdapter)listView.getAdapter()).attachToFirebase("posts");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(getString(R.string.app_name));
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
