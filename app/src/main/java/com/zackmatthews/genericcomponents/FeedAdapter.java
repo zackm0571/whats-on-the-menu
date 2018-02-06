@@ -62,7 +62,7 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
     }
 
     static class ViewHolder{
-        TextView msg, title;
+        TextView msg, title, availability;
         ImageView img;
         ProgressBar progressBar;
         ViewGroup imageHolder;
@@ -81,6 +81,7 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
                 holder.img = view.findViewById(R.id.feed_item_img);
                 holder.progressBar = view.findViewById(R.id.progressBar);
                 holder.imageHolder = view.findViewById(R.id.imageHolder);
+                holder.availability = view.findViewById(R.id.availability);
                 view.setTag(holder);
             }
         }
@@ -95,10 +96,11 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
         holder.title.setText(model.title);
         holder.msg.setText(model.msg);
 
+        holder.availability.setText(model.getAvailabiiltyString());
+        holder.availability.setTextColor(model.getColorForAvailabilityStatus());
 
         boolean isPicsEnabled = true;
         holder.imageHolder.setVisibility(View.GONE);
-        //holder.img.setImageBitmap(null);
 
         if(!isPicsEnabled || model.img_id == null) {
             return view;
