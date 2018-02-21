@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseException;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.zackmatthews.genericcomponents.managers.LruCacheManager;
@@ -119,7 +120,16 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
     public void onDataChange(DataSnapshot dataSnapshot) {
         modelList.clear();
         for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-            modelList.add(postSnapshot.getValue(FeedItemModel.class));
+            try {
+                FeedItemModel modelObj = postSnapshot.getValue(FeedItemModel.class);
+                if (modelObj != null){
+                    modelList.add(modelObj);
+                }
+            }
+            catch(DatabaseException e){
+                //Can't convert to FeedItemModel, check data
+                e.printStackTrace();
+            }
         }
         this.notifyDataSetChanged();
     }
