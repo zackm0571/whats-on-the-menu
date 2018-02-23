@@ -2,54 +2,62 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content">
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        />
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/imageHolder"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="start"
+            android:background="@android:color/transparent"
+            >
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/feed_item_img"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:visibility="gone"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"/>
+        </RelativeLayout>
+
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="80dp"
             android:textSize="24sp"
             android:layout_gravity="start"
+            android:textAlignment="center"
             android:textColor="@android:color/black"
             android:gravity="start"
             android:layout_weight="0.5"
-            android:layout_margin="10dp"
             android:text="Test"/>
-         <TextView
+
+
+        <TextView
             android:id="@+id/availability"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="80dp"
             android:textSize="24sp"
             android:layout_weight="0.5"
             android:layout_gravity="start"
+            android:textAlignment="center"
             android:textColor="@android:color/holo_green_dark"
             android:gravity="end"
-            android:layout_margin="10dp"
             android:text="Available"/>
     </LinearLayout>
-    <RelativeLayout
-        android:id="@+id/imageHolder"
-        android:layout_margin="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="120dp"
-        android:layout_gravity="center"
-        android:background="@android:color/transparent"
-        >
-        <ImageView
-            android:id="@+id/feed_item_img"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:visibility="gone"
-            android:layout_centerInParent="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminate="true"/>
-        </RelativeLayout>
     <TextView
         android:id="@+id/msg"
         android:layout_width="match_parent"
@@ -57,6 +65,6 @@
         android:textSize="24sp"
         android:gravity="center"
         android:visibility="visible"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="20dp"
         android:text="Test content"/>
 </LinearLayout>

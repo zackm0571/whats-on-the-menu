@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /**
  * Created by zackmatthews on 9/25/17.
  */
@@ -64,7 +66,7 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
 
     static class ViewHolder{
         TextView msg, title, availability;
-        ImageView img;
+        CircleImageView img;
         ProgressBar progressBar;
         ViewGroup imageHolder;
     }
@@ -107,7 +109,6 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
             return view;
         }
         new LoadImageTask(model, holder).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, null);
-
         return view;
     }
 

@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.zackmatthews.genericcomponents.managers.ApplicationManager;
 import com.zackmatthews.genericcomponents.managers.MyFirebaseManager;
 
 import java.io.File;
@@ -36,28 +37,29 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         setContentView(R.layout.activity_main);
         listView = (ListView)findViewById(R.id.listView);
         listView.setAdapter(new FeedAdapter(this));
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                showDeletePostDialog((FeedItemModel)adapterView.getItemAtPosition(i));
-                return false;
-            }
-        });
-        ((FeedAdapter)listView.getAdapter()).attachToFirebase("posts");
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(getString(R.string.app_name));
-        setSupportActionBar(toolbar);
+        if(ApplicationManager.isAdmin) {
+            listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    showDeletePostDialog((FeedItemModel) adapterView.getItemAtPosition(i));
+                    return false;
+                }
+            });
+        }
+        ((FeedAdapter)listView.getAdapter()).attachToFirebase("posts");
+//
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        toolbar.setTitle(getString(R.string.app_name));
+//
+//        setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setVisibility( ApplicationManager.isAdmin ? View.VISIBLE : View.INVISIBLE );
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showAddPostDialog();
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                //        .setAction("Action", null).show();
-
-                //MyFirebaseManager.getInstance().writeObjectToDb("messages", "Hello World!");
             }
         });
     }
