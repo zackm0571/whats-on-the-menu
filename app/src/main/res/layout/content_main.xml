@@ -57,6 +57,7 @@
 
         </LinearLayout>
     </RelativeLayout>
+
     <!--<TextView-->
         <!--android:layout_width="match_parent"-->
         <!--android:layout_height="40sp"-->
@@ -84,9 +85,23 @@
         <!--android:background="@drawable/layout_border"-->
         <!--android:text="Live Shop Menu"/>-->
 
+<RelativeLayout
+    android:layout_weight="0.85"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/feed_bg"
+        android:scaleType="centerCrop"
+        android:alpha="0.3"/>
     <ListView
         android:id="@+id/listView"
         android:layout_weight="0.85"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="10.0dp"/>
+</RelativeLayout>
 </LinearLayout>
