@@ -54,7 +54,7 @@
             android:layout_weight="0.5"
             android:layout_gravity="start"
             android:textAlignment="center"
-            android:textColor="@android:color/holo_green_dark"
+            android:textColor="#006400"
             android:gravity="end"
             android:text="Available"/>
     </LinearLayout>
