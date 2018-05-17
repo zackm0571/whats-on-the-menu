@@ -8,7 +8,8 @@
     tools:context="com.zackmatthews.genericcomponents.MainActivity"
     tools:showIn="@layout/activity_main"
     android:background="@android:color/transparent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:keepScreenOn="true">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="140dp"
