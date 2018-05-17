@@ -21,6 +21,13 @@
         android:layout_margin="20dp"
         android:hint="@string/add_post_message_hint"/>
 
+    <CheckBox
+        android:id="@+id/cb_addpost_avaiable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Available"
+        android:checked="true"/>
+
     <Button
         android:id="@+id/btn_addpost_picture"
         android:layout_width="match_parent"

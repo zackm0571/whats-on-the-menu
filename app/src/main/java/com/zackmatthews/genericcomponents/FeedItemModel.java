@@ -12,64 +12,18 @@ import java.util.HashMap;
  */
 
 public class FeedItemModel {
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-        this.isModified = true;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-        this.isModified = true;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-        this.isModified = true;
-    }
-
-    public String getImg_id() {
-        return img_id;
-    }
-
-    public void setImg_id(String img_id) {
-        this.img_id = img_id;
-        this.isModified = true;
-    }
-
-    public boolean isAvailability() {
-        return availability;
-    }
-
-    public void setAvailability(boolean availability) {
-        this.availability = availability;
-        this.isModified = true;
-    }
 
     private String id;
     private String title;
     private String msg;
     private String img_id;
-    private boolean availability;
-    private boolean isModified = false;
+    private boolean availability = true;
     private static final String hexGreen = "#006400";
     public String getAvailabiiltyString(){
         return availability ? "Available" : "Out";
     }
 
     public int getColorForAvailabilityStatus(){
-
         return availability ?  Color.parseColor(hexGreen) : Color.RED;
     }
 
@@ -81,8 +35,48 @@ public class FeedItemModel {
         ref.child("title").setValue(title);
         ref.child("msg").setValue(msg);
         ref.child("availability").setValue(availability);
-        ref.push();
-
-        //.writeObjectToDb(MyFirebaseManager.postDir + "/" + id, this);
+        ref.child("id").setValue(id);
+        ref.child("img_id").setValue(img_id);
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public String getImg_id() {
+        return img_id;
+    }
+
+    public void setImg_id(String img_id) {
+        this.img_id = img_id;
+    }
+
+    public boolean isAvailability() {
+        return availability;
+    }
+
+    public void setAvailability(boolean availability) {
+        this.availability = availability;
+    }
+
 }

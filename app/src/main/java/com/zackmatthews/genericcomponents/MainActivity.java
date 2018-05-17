@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -105,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         final View v = inflater.inflate(R.layout.add_post_dialog, null);
         ((EditText)v.findViewById(R.id.et_addpost_title)).setText(model.getTitle());
         ((EditText)v.findViewById(R.id.et_addpost_msg)).setText(model.getMsg());
+        ((CheckBox)v.findViewById(R.id.cb_addpost_avaiable)).setChecked(model.isAvailability());
         dialogView = new AlertDialog.Builder(this)
                 .setView(v)
                 .setCancelable(true)
@@ -118,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                         item.setTitle(((EditText)v.findViewById(R.id.et_addpost_title)).getText().toString());
                         item.setMsg(((EditText)v.findViewById(R.id.et_addpost_msg)).getText().toString());
                         item.setId(model.getId());
-                        item.setAvailability(model.isAvailability());
+                        item.setAvailability(((CheckBox)v.findViewById(R.id.cb_addpost_avaiable)).isChecked());
                         item.setImg_id(model.getImg_id());
 
 //                        if(hasImg){
@@ -145,6 +147,10 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         if(dialogView != null){
             dialogView.dismiss();
         }
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        if(inflater == null) return;
+        final View v = inflater.inflate(R.layout.add_post_dialog, null);
+
         dialogView = new AlertDialog.Builder(this)
                 .setView(R.layout.add_post_dialog).setCancelable(true).setTitle("Add post")
                 .setPositiveButton("Post", new DialogInterface.OnClickListener() {
@@ -158,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                         item.setId(String.valueOf(System.currentTimeMillis()));
                         item.setMsg(msgText.getText().toString());
                         item.setTitle(titleText.getText().toString());
+                        item.setAvailability(((CheckBox)v.findViewById(R.id.cb_addpost_avaiable)).isChecked());
                         if(hasImg){
                             item.setImg_id(item.getId());
                             MyFirebaseManager.getInstance().uploadFile(tmpUploadDir, item.getImg_id(), MainActivity.this);
