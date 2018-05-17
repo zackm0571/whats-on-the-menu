@@ -11,6 +11,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -29,7 +30,7 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity implements OnSuccessListener{
 
     private ListView listView;
-    private AlertDialog dialogView, deletePostDialogView;
+    private AlertDialog dialogView;
     private String tmpUploadDir = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
             listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    showDeletePostDialog((FeedItemModel) adapterView.getItemAtPosition(i));
+                    showModifyPostDialog((FeedItemModel) adapterView.getItemAtPosition(i));
                     return false;
                 }
             });
@@ -64,28 +65,80 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
         });
     }
 
-    private void showDeletePostDialog(final FeedItemModel item){
+    private void showModifyPostDialog(final FeedItemModel item){
 
-        if(deletePostDialogView != null){
-            deletePostDialogView.dismiss();
+        if(dialogView != null){
+            dialogView.dismiss();
         }
 
-        deletePostDialogView = new AlertDialog.Builder(this).setTitle("Delete Post?")
+        dialogView = new AlertDialog.Builder(this).setTitle("Modify Post?")
                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         item.deletePost();
                     }
                 })
+                .setNeutralButton("Edit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        showEditPostDialog(item);
+                    }
+                })
                 .setCancelable(true)
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        deletePostDialogView.dismiss();
+                        dialogView.dismiss();
                     }
                 })
                 .create();
-        deletePostDialogView.show();
+        dialogView.show();
+    }
+
+    private void showEditPostDialog(final FeedItemModel model){
+        if(dialogView != null){
+            dialogView.dismiss();
+        }
+
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        if(inflater == null) return;
+        final View v = inflater.inflate(R.layout.add_post_dialog, null);
+        ((EditText)v.findViewById(R.id.et_addpost_title)).setText(model.getTitle());
+        ((EditText)v.findViewById(R.id.et_addpost_msg)).setText(model.getMsg());
+        dialogView = new AlertDialog.Builder(this)
+                .setView(v)
+                .setCancelable(true)
+                .setTitle("Editing post")
+                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        boolean hasImg = tmpUploadDir != null && tmpUploadDir.length() > 0;
+                        FeedItemModel item = new FeedItemModel();
+                        item.setTitle(((EditText)v.findViewById(R.id.et_addpost_title)).getText().toString());
+                        item.setMsg(((EditText)v.findViewById(R.id.et_addpost_msg)).getText().toString());
+                        item.setId(model.getId());
+                        item.setAvailability(model.isAvailability());
+                        item.setImg_id(model.getImg_id());
+
+//                        if(hasImg){
+//                            item.setImg_id(item.getId());
+//                            MyFirebaseManager.getInstance().uploadFile(tmpUploadDir, item.getImg_id(), MainActivity.this);
+//                        }
+
+                       item.savePost();
+                    }
+                })
+                .create();
+        dialogView.show();
+
+        Button addPictureButton = ((Button)dialogView.findViewById(R.id.btn_addpost_picture));
+        addPictureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dispatchTakePictureIntent();
+            }
+        });
     }
 
     private void showAddPostDialog(){
@@ -102,15 +155,15 @@ public class MainActivity extends AppCompatActivity implements OnSuccessListener
                         boolean hasImg = tmpUploadDir != null && tmpUploadDir.length() > 0;
 
                         FeedItemModel item = new FeedItemModel();
-                        item.id = String.valueOf(System.currentTimeMillis());
-                        item.msg = msgText.getText().toString();
-                        item.title = titleText.getText().toString();
+                        item.setId(String.valueOf(System.currentTimeMillis()));
+                        item.setMsg(msgText.getText().toString());
+                        item.setTitle(titleText.getText().toString());
                         if(hasImg){
-                            item.img_id = item.id;
-                            MyFirebaseManager.getInstance().uploadFile(tmpUploadDir, item.img_id, MainActivity.this);
+                            item.setImg_id(item.getId());
+                            MyFirebaseManager.getInstance().uploadFile(tmpUploadDir, item.getImg_id(), MainActivity.this);
                         }
 
-                        MyFirebaseManager.getInstance().writeObjectToDb(MyFirebaseManager.postDir + "/" + item.id, item);
+                        MyFirebaseManager.getInstance().writeObjectToDb(MyFirebaseManager.postDir + "/" + item.getId(), item);
                     }
                 })
                 .create();

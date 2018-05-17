@@ -97,8 +97,8 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
 
         FeedItemModel model = getItem(i);
 
-        holder.title.setText(model.title);
-        holder.msg.setText(model.msg);
+        holder.title.setText(model.getTitle());
+        holder.msg.setText(model.getMsg());
 
         holder.availability.setText(model.getAvailabiiltyString());
         holder.availability.setTextColor(model.getColorForAvailabilityStatus());
@@ -106,7 +106,7 @@ public class FeedAdapter extends BaseAdapter implements ValueEventListener{
         boolean isPicsEnabled = true;
         holder.imageHolder.setVisibility(View.GONE);
 
-        if(!isPicsEnabled || model.img_id == null) {
+        if(!isPicsEnabled || model.getImg_id() == null) {
             return view;
         }
         new LoadImageTask(model, holder).executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, null);
@@ -162,17 +162,17 @@ class LoadImageTask extends AsyncTask<Void, Void, Bitmap>
 
     @Override
     protected Bitmap doInBackground(Void... arg) {
-        bmp = LruCacheManager.getInstance().get(model.img_id);
+        bmp = LruCacheManager.getInstance().get(model.getImg_id());
         if(bmp == null){
             try {
-                tmpPic = File.createTempFile(model.img_id, ".jpg");
+                tmpPic = File.createTempFile(model.getImg_id(), ".jpg");
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             tmpPhotoURI = Uri.fromFile(tmpPic);
 
-            MyFirebaseManager.getInstance().getStorageRef().child(model.img_id).getFile(tmpPhotoURI)
+            MyFirebaseManager.getInstance().getStorageRef().child(model.getImg_id()).getFile(tmpPhotoURI)
                     .addOnSuccessListener(this).addOnFailureListener(this);
         }
         return bmp;
@@ -203,7 +203,7 @@ class LoadImageTask extends AsyncTask<Void, Void, Bitmap>
         holder.img.setVisibility(View.VISIBLE);
         holder.imageHolder.setVisibility(View.VISIBLE);
         holder.progressBar.setVisibility(View.GONE);
-        LruCacheManager.getInstance().put(model.img_id, bmp);
+        LruCacheManager.getInstance().put(model.getImg_id(), bmp);
     }
 
     @Override

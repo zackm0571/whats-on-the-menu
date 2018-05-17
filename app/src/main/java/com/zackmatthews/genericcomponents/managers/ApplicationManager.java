@@ -7,7 +7,7 @@ import android.app.Application;
  */
 
 public class ApplicationManager extends Application {
-    public static final boolean isAdmin = false;
+    public static final boolean isAdmin = true;
     @Override
     public void onTerminate() {
         super.onTerminate();
